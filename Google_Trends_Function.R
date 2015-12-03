@@ -83,15 +83,16 @@ Google_Trends_Fetch = function(x,y){
   authenticatePage2 <- getURL("http://www.google.com", curl=ch)
   res <- getForm(trendsURL, q=x, date = y, content=1, export=1, graph="all_csv", curl=ch, cat="Nyheder")
 }
-
-gtgetgoole = Google_Trends_Fetch("Paris", "2015-11")
+###
+gtgetgoole = Google_Trends_Fetch("Paris", "2015-11") # Feed in info
+###
 gtgetgoole
 
 library("plyr")
-
+ 
 getget = list(gtgetgoole)
 
-getget2 = ldply(getget)
+getget2 = ldply(getget, .fun = )
 getget2 = rbind(getget)
 
 
