@@ -71,10 +71,29 @@ gLogin <- function(username, password) {
 ############################################
 ch <- gLogin( username, password )
 authenticatePage2 <- getURL("http://www.google.com", curl=ch)
-res <- getForm(trendsURL, q="Paris", date = "2015-11", content=1, export=1, graph="all_csv", curl=ch)
+res <- getForm(trendsURL, q="Paris", date = "2015-10", content=1, export=1, graph="all_csv", curl=ch)
 res
 # Check if quota limit reached
 if( grepl( "You have reached your quota limit", res ) ) {
   stop( "Quota limit reached; You should wait a while and try again lateer" )
 }
 
+Google_Trends_Fetch = function(x,y){
+  ch <- gLogin( username, password )
+  authenticatePage2 <- getURL("http://www.google.com", curl=ch)
+  res <- getForm(trendsURL, q=x, date = y, content=1, export=1, graph="all_csv", curl=ch, cat="Nyheder")
+}
+
+gtgetgoole = Google_Trends_Fetch("Paris", "2015-11")
+gtgetgoole
+
+library("plyr")
+
+getget = list(gtgetgoole)
+
+getget2 = ldply(getget)
+getget2 = rbind(getget)
+
+
+
+?ldply
