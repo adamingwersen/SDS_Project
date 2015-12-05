@@ -86,15 +86,9 @@ Google_Trends_Fetch = function(x,y){
 ###
 gtgetgoole = Google_Trends_Fetch("Paris", "2015-11") # Feed in info
 ###
-gtgetgoole
-
-library("plyr")
- 
-getget = list(gtgetgoole)
-
-getget2 = ldply(getget, .fun = )
-getget2 = rbind(getget)
 
 
 
-?ldply
+
+
+  
