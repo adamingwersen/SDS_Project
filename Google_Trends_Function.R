@@ -84,11 +84,16 @@ Google_Trends_Fetch = function(x,y){
   res <- getForm(trendsURL, q=x, date = y, content=1, export=1, graph="all_csv", curl=ch, cat="Nyheder")
 }
 ###
-gtgetgoole = Google_Trends_Fetch("Paris", "2015-11") # Feed in info
+
+
+
+gtgetgoole = Google_Trends_Fetch("Attack+Peshawar+Taliban", "2015-02") # Feed in info
 ###
 
-
-
-
-
-  
+Google.Trends.write = list()
+for(i in x){
+  print(paste("processing", i, sep = " :: "))
+  paste('Gtrends', i, 'csv', sep = "\t")
+  Google.Trends.write[[i]] = Google_Trends_Fetch(i)
+  cat("done!\n")
+}

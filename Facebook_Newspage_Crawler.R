@@ -71,6 +71,9 @@ new_DF=data.frame(new_DF)
 page.names = gsub("\\https://www.facebook.com/", "", new_DF$new_DF)
 page.names = gsub("/", "", page.names)
 
+#Remove duplicates
+page.names = page.names[!duplicated(page.names)]
+
 
 # SETTING UP
   # Facebook API Oauth procedure - setting up using Guide from Pablo Barberas Rfacebook package
@@ -85,22 +88,33 @@ load("fb_oauth")
 # Creating function for gathering all 2015 posts
 
 Facebook_Page_Fetch = function(page.names){
-  fb.feed = getPage(page.names, token = fb_oauth, n = 10, since = '2015/01/01', until = '2015/12/05')
+  fb.feed = getPage(page.names, token = fbkey, n = 9999, since = '2015/01/01', until = '2015/12/05')
   return(cbind(fb.feed, page.names))
 }
 
-getPage("natgeo", token = fb_oauth, n = 100000, since = '2015/01/01', until = '2015/12/05' )
+fbkey = "CAACEdEose0cBACiZAIT5ElInPxTwUM5mI6XDNTNQCW1aEXeet5kzhBx96Ie91dutCME65FKep0aHL9FlYCPZBOGuvRA4t6wZCiuMDSWd1pZAFMdwWpAwM2ldZA7PmJ8vmu6nxtrZBStfx2SGUXTo2PaeyiN4TlgGcVTQzf8exii6J1s1xN9y43rCwkM9rqEZAlMRBxJTowiHQZDZD"
 
-Ply.Fetch = ldply(page.names, Facebook_Page_Fetch, .inform = TRUE)
+Facebook_Page_Fetch("natgeo")
 
-News_Facebook.df = ldply(Ply.Fetch, data.frame) 
+getPage("natgeo", token = fb_oauth, n = 100000, since = '2015/01/01', until = '2015/12/05')
 
-options(warn=1)
-News_Facebook.ldf = list()
-for(i in page.names){
-  print(paste("processing", i, sep = " :: "))
-  News_Facebook.ldf[[i]] = Facebook_Page_Fetch(i)
-  Sys.sleep(0.05)
-  cat("done!\n")
-}
+
+
+Ply.Fetch = data.frame(ldply(page.names, Facebook_Page_Fetch, .inform = TRUE))
+
+News_Facebook.df = ldply(Ply.Fetch, data.frame)
+
+
+install.packages("reshape2")
+library("reshape2")
+
+first.fb.list = News_Facebook.ldf
+Temporary.df = ldply(first.fb.list, data.frame)
+Temporary.df = as.data.frame(News_Facebook.ldf)
+Temporary.df = data.frame(Temporary.df)
+
+as.data.frame()
+
+
+ 
 
