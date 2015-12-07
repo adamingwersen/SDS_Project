@@ -1,10 +1,9 @@
-# Setup for grabbing facebook page history of 100 news pages
-
-# The packages
+########################### Setup for grabbing facebook page history of 100 news pages:######################
+### The packages
 pkgs = c("rvest", "plyr", "stringr", "devtools", "httr", "RCurl", "curl", "XML")
 lapply(pkgs, library, character.only = TRUE)
 
-# First steps for crawling fanpagelist.com for facebook pages
+### First steps for crawling fanpagelist.com for facebook pages
   # Website structure : http://.../sort/fans/page1, http://.../sort/fans/page2, etc.: Shows 20 fb-pages
   # Create vector of 5 -> insert as to have 5 different links -> 100 fb-pages
 vec5 = c(1:5)
@@ -16,10 +15,10 @@ link_str_replace = function(vec5){
 
 link.sub = llply(vec5, link_str_replace) # Coerce into list by applying link_str_replace fct.
 
-# Crawling strategy:
-# As the website does not have href's for FB on front page, we need to visit each fanpagelist.com's page for the facebook-page
-# From there we can retrieve the link to facebook. 
-  # Fetch URL's for each fanpagelist.com/page 
+### Crawling strategy:
+  # As the website does not have href's for FB on front page, we need to visit each fanpagelist.com's page for the facebook-page
+  # From there we can retrieve the link to facebook. 
+      # Fetch URL's for each fanpagelist.com/page 
 
 css.selector_1 = "a:nth-child(3)"   #URL and/or TITLE depends on 'html_attr(name = href/title)'
 css.selector_2 = "div.listing_profile > a"
@@ -30,7 +29,7 @@ scrape_links_fanpage = function(link.sub){
   return(rbind(link.url))
 }
 
-  # Apply function using simple for-loop
+### Apply function using simple for-loop
 fanpage.data = list()
 for(i in link.sub){
   print(paste("processing", i, sep = " "))
@@ -38,24 +37,25 @@ for(i in link.sub){
   Sys.sleep(1)
   cat("done!\n")
 }
-
+### Setting up data for next step
   # Each URL yields list with 20 elements 
-  # Manipulate into workable list
+  # Manipulate into dataframe, transpose, read as charactors rather than factors
 fanpage.df = data.frame(fanpage.data)
 fanpage.df = t(fanpage.df)
 fanpage.df = as.character(fanpage.df)
 
-
-
-##### second loop
-fanpageurl = "http://fanpagelist.comLANK"
-
+### Preparing for crawling fanpagelist.com's subsites for facebook links
+  # http://www.fanpagelist.com only provides href in condensed form: /page/bbc
+  # We need the full URL to actaully visit the website
+    
+fanpageurl = "http://fanpagelist.comLANK" # The URL-part that is not provided by scraping
 fanpage.fct = function(fanpage.df){
   link.sub2 = gsub("\\LANK", fanpage.df, fanpageurl)
 }
-
 fanpage.li = llply(fanpage.df, fanpage.fct)
 
+### The actual crawler:
+  # Look at the complete link and fetch only the facebook href-link
 css.selector_3 = "a:nth-child(3)"
 scrape_links_facebook = function(link.sub2){
   facebook.link.url = read_html(link.sub2, encoding = "UTF-8") %>%
@@ -63,7 +63,7 @@ scrape_links_facebook = function(link.sub2){
     html_attr(name = "href")
   return(cbind(facebook.link.url))
 }
-
+  # Do this for all links contained in fanpage.li
 facebook.data = list()
 for(i in fanpage.li){
   print(paste("processing", i, sep = " "))
@@ -72,19 +72,21 @@ for(i in fanpage.li){
   cat("done!\n")
 }
 
-facebook.data=unlist(facebook.data)
-facebook.frame=data.frame(facebook.data)
+### Reformatting the data
+  # As before the format is not really workable
+  # Some manipulations are required
+facebook.data = unlist(facebook.data)
+facebook.frame = data.frame(facebook.data)
 new_DF = facebook.data
 new_DF = new_DF[grep("www.facebook.com", new_DF)]
-new_DF=data.frame(new_DF)
+new_DF = data.frame(new_DF)
 page.names = gsub("\\https://www.facebook.com/", "", new_DF$new_DF)
 page.names = gsub("/", "", page.names)
-
-#Remove duplicates
+  #Remove duplicates
 page.names = page.names[!duplicated(page.names)]
 
-
-# SETTING UP
+############################## Utilizing the Rfacebook-package for gathering posts #####################
+### SETTING UP
   # Facebook API Oauth procedure - setting up using Guide from Pablo Barberas Rfacebook package
 install_github("pablobarbera/Rfacebook/Rfacebook")
 library("Rfacebook")
@@ -94,35 +96,35 @@ save(fb_oauth, file = "fb_oauth")
   ## Load oauth-key/token
 load("fb_oauth")
 
-# Creating function for gathering all 2015 posts
-
+### Creating function for gathering all 2015 posts
 Facebook_Page_Fetch = function(page.names){
   fb.feed = getPage(page.names, token = fbkey, n = 9999, since = '2015/01/01', until = '2015/12/05')
   return(cbind(fb.feed, page.names))
 }
-
+  # Token
 fbkey = "CAACEdEose0cBACiZAIT5ElInPxTwUM5mI6XDNTNQCW1aEXeet5kzhBx96Ie91dutCME65FKep0aHL9FlYCPZBOGuvRA4t6wZCiuMDSWd1pZAFMdwWpAwM2ldZA7PmJ8vmu6nxtrZBStfx2SGUXTo2PaeyiN4TlgGcVTQzf8exii6J1s1xN9y43rCwkM9rqEZAlMRBxJTowiHQZDZD"
 
-Facebook_Page_Fetch("natgeo")
-
+  # Example of how the function works
 getPage("natgeo", token = fb_oauth, n = 100000, since = '2015/01/01', until = '2015/12/05')
 
-
-
+### Looping through page.names
+  # Plyr loop is not too functional
 Ply.Fetch = data.frame(ldply(page.names, Facebook_Page_Fetch, .inform = TRUE))
 
-News_Facebook.df = ldply(Ply.Fetch, data.frame)
+  # For loop allows for sleep-timer and more elaborate costumization of output
+options(warn=1)
+News_Facebook.ldf = list()
+for(i in page.names){
+  print(paste("processing", i, sep = " :: "))
+  News_Facebook.ldf[[i]] = Facebook_Page_Fetch(i)
+  Sys.sleep(0.01)
+  cat("done!\n")
+}
 
-
-install.packages("reshape2")
-library("reshape2")
-
+  # All we need to do now is to ldply(..., data.frame) in order to get tidy dataframe
 first.fb.list = News_Facebook.ldf
 Temporary.df = ldply(first.fb.list, data.frame)
-Temporary.df = as.data.frame(News_Facebook.ldf)
-Temporary.df = data.frame(Temporary.df)
 
-as.data.frame()
 
 
  
