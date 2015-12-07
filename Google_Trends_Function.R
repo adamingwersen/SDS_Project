@@ -96,3 +96,5 @@ for(i in x){
   Google.Trends.write[[i]] = Google_Trends_Fetch(i)
   cat("done!\n")
 }
+
+# Yet
