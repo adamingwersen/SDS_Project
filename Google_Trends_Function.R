@@ -78,18 +78,17 @@ if( grepl( "You have reached your quota limit", res ) ) {
   stop( "Quota limit reached; You should wait a while and try again lateer" )
 }
 
+# Create function with double input: search-term & date (YYYY-MM)
 Google_Trends_Fetch = function(x,y){
   ch <- gLogin( username, password )
   authenticatePage2 <- getURL("http://www.google.com", curl=ch)
   res <- getForm(trendsURL, q=x, date = y, content=1, export=1, graph="all_csv", curl=ch, cat="Nyheder")
 }
-###
 
-
-
+# Example of how the function works
 gtgetgoole = Google_Trends_Fetch("Attack+Peshawar+Taliban", "2015-02") # Feed in info
-###
 
+# For-loop that runs through list and outputs csv-file for each element, i, in list
 Google.Trends.write = list()
 for(i in x){
   print(paste("processing", i, sep = " :: "))
