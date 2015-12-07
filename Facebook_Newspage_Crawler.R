@@ -4,7 +4,9 @@
 pkgs = c("rvest", "plyr", "stringr", "devtools", "httr", "RCurl", "curl", "XML")
 lapply(pkgs, library, character.only = TRUE)
 
-# Crawling fanpagelist.com for facebook pages
+# First steps for crawling fanpagelist.com for facebook pages
+  # Website structure : http://.../sort/fans/page1, http://.../sort/fans/page2, etc.: Shows 20 fb-pages
+  # Create vector of 5 -> insert as to have 5 different links -> 100 fb-pages
 vec5 = c(1:5)
 linksub.li = "http://fanpagelist.com/category/news/view/list/sort/fans/pageLANK"
 
@@ -12,7 +14,12 @@ link_str_replace = function(vec5){
   link.sub = gsub("\\LANK", vec5, linksub.li)
 }
 
-link.sub = llply(vec5, link_str_replace)
+link.sub = llply(vec5, link_str_replace) # Coerce into list by applying link_str_replace fct.
+
+# Crawling strategy:
+# As the website does not have href's for FB on front page, we need to visit each fanpagelist.com's page for the facebook-page
+# From there we can retrieve the link to facebook. 
+  # Fetch URL's for each fanpagelist.com/page 
 
 css.selector_1 = "a:nth-child(3)"   #URL and/or TITLE depends on 'html_attr(name = href/title)'
 css.selector_2 = "div.listing_profile > a"
@@ -23,7 +30,7 @@ scrape_links_fanpage = function(link.sub){
   return(rbind(link.url))
 }
 
-
+  # Apply function using simple for-loop
 fanpage.data = list()
 for(i in link.sub){
   print(paste("processing", i, sep = " "))
@@ -32,10 +39,12 @@ for(i in link.sub){
   cat("done!\n")
 }
 
+  # Each URL yields list with 20 elements 
+  # Manipulate into workable list
 fanpage.df = data.frame(fanpage.data)
 fanpage.df = t(fanpage.df)
 fanpage.df = as.character(fanpage.df)
-fanpage.li = fanpage.df
+
 
 
 ##### second loop
