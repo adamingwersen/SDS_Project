@@ -1,6 +1,7 @@
 ---
 title: "<center>Real Life Events on The Web: <br>Decay Rate of Google Searches and Facebook Posts</center>"
 author: "Group 15, Social Data Science"
-date: "5. dec. 2015"
+date: "15. dec. 2015"
 output: html_document
 ---
+

@@ -97,12 +97,18 @@ save(fb_oauth, file = "fb_oauth")
 load("fb_oauth")
 
 ### Creating function for gathering all 2015 posts
-Facebook_Page_Fetch = function(page.names){
-  fb.feed = getPage(page.names, token = fbkey, n = 9999, since = '2015/01/01', until = '2015/12/05')
-  return(cbind(fb.feed, page.names))
+Facebook_Page_Fetch = function(x){
+  fb.feed = getPage(x, token = fbkey, n = 99999, since = '2015/01/01', until = '2015/12/05')
+  return(cbind(fb.feed, x))
 }
   # Token
-fbkey = "CAACEdEose0cBACiZAIT5ElInPxTwUM5mI6XDNTNQCW1aEXeet5kzhBx96Ie91dutCME65FKep0aHL9FlYCPZBOGuvRA4t6wZCiuMDSWd1pZAFMdwWpAwM2ldZA7PmJ8vmu6nxtrZBStfx2SGUXTo2PaeyiN4TlgGcVTQzf8exii6J1s1xN9y43rCwkM9rqEZAlMRBxJTowiHQZDZD"
+fbkey = "CAACEdEose0cBACU13XBqlYotJyJU6V9ohCsTFhnjS5tRKYEnpGt8iueSiQiXzzJwN9dFlFMeHRYCS4MTQoUchUfptAfZC8o5MZAVq3XVD8zYKx3ykgYJdcNki4r6M3HycvNY8yD3DxKx3OLe9vG6aftHycZBwXY34YrihhuEfLstghJsC1Tw737SIZBlyCOqLKjjm0RndQZDZD"
+page.names.static = page.names
+page.names.1 = page.names.static[43:95]
+
+# Skipped:
+  # Huffington Post
+  # Fox Sports
 
   # Example of how the function works
 getPage("natgeo", token = fb_oauth, n = 100000, since = '2015/01/01', until = '2015/12/05')
@@ -113,19 +119,55 @@ Ply.Fetch = data.frame(ldply(page.names, Facebook_Page_Fetch, .inform = TRUE))
 
   # For loop allows for sleep-timer and more elaborate costumization of output
 options(warn=1)
-News_Facebook.ldf = list()
-for(i in page.names){
+News_Facebook.ldf11 = list()
+for(i in page.names.1){
   print(paste("processing", i, sep = " :: "))
-  News_Facebook.ldf[[i]] = Facebook_Page_Fetch(i)
+  News_Facebook.ldf11[[i]] = Facebook_Page_Fetch(i)
   Sys.sleep(0.01)
   cat("done!\n")
 }
 
+
   # All we need to do now is to ldply(..., data.frame) in order to get tidy dataframe
 first.fb.list = News_Facebook.ldf
+second.fb.list = News_Facebook.ldf1
+third.fb.list = News_Facebook.ldf2
+fourth.fb.list = News_Facebook.ldf3
+fifth.fb.list = News_Facebook.ldf4
+sixth.fb.list = News_Facebook.ldf5
+seventh.fb.list = News_Facebook.ldf6
+eighth.fb.list = News_Facebook.ldf7
+ninth.fb.list = News_Facebook.ldf8
+tenth.fb.list = News_Facebook.ldf9
+eleventh.fb.list = News_Facebook.ldf10
+twelfth.fb.list = News_Facebook.ldf11
+thirteenth.fb.list = News_Facebook.ldf12
+
 Temporary.df = ldply(first.fb.list, data.frame)
+Temporary2.df = ldply(second.fb.list, data.frame)
+Temporary3.df = ldply(third.fb.list, data.frame)
+Temporary4.df = ldply(fourth.fb.list, data.frame)
+Temporary5.df = ldply(fifth.fb.list, data.frame)
+Temporary6.df = ldply(sixth.fb.list, data.frame)
+Temporary7.df = ldply(seventh.fb.list, data.frame)
+Temporary8.df = ldply(eighth.fb.list, data.frame)
+Temporary9.df = ldply(ninth.fb.list, data.frame)
+Temporary10.df = ldply(tenth.fb.list, data.frame)
+Temporary11.df = ldply(eleventh.fb.list, data.frame)
+Temporary12.df = ldply(twelfth.fb.list, data.frame)
+Temporary13.df = ldply(thirteenth.fb.list, data.frame)
 
+names(Temporary11.df)[12] = "page.names"
 
+library(dplyr)
+Mixed.df = rbind(Temporary.df, Temporary2.df, Temporary3.df, Temporary4.df, Temporary6.df, Temporary7.df, Temporary8.df, Temporary9.df, Temporary10.df, Temporary11.df, Temporary12.df, Temporary13.df)
 
+head(page.names.1)
  
+TerrorFB.df = Mixed.df$message[grep("Boko Haram|Kidnapping|Terror|Terrorism|Suicide Bomb|")]
+
+
+
+
+
 

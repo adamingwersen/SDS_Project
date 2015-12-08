@@ -89,12 +89,14 @@ Google_Trends_Fetch = function(x,y){
 gtgetgoole = Google_Trends_Fetch("Attack+Peshawar+Taliban", "2015-02") # Feed in info
 
 # For-loop that runs through list and outputs csv-file for each element, i, in list
+  # Write/Read locale
+out <- "C:/Users/Adam/Dropbox/7. Semester Polit/Social Data Science/Scripts_R/SDS_R_Code/SDS_Project/csv-symphony"
+  
 Google.Trends.write = list()
-for(i in x){
+for(i in 1:length()){
   print(paste("processing", i, sep = " :: "))
-  paste('Gtrends', i, 'csv', sep = "\t")
+  write.table(x=out, file= i, sep =";")
   Google.Trends.write[[i]] = Google_Trends_Fetch(i)
   cat("done!\n")
 }
-
 # Yet
